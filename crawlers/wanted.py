@@ -1,4 +1,5 @@
-"""원티드 크롤러 - 기업명 직접 검색"""
+"""원티드 크롤러 - 기업명 키워드 검색 (company_id API 미사용)"""
+import re
 import requests
 import time
 from datetime import datetime
@@ -10,28 +11,18 @@ HEADERS = {
 }
 
 
-def _get_company_id(company: str) -> int | None:
-    """기업명으로 원티드 company_id 조회"""
-    try:
-        resp = requests.get(
-            "https://www.wanted.co.kr/api/v4/companies",
-            params={"query": company},
-            headers=HEADERS,
-            timeout=8,
-        )
-        if resp.status_code != 200:
-            return None
-        data = resp.json()
-        items = data.get("data", [])
-        if not items:
-            return None
-        # 첫 번째 결과 (가장 유사한 기업)
-        return items[0].get("id")
-    except Exception:
-        return None
+def _normalize_co(name: str) -> str:
+    name = re.sub(r'주식회사|㈜|\(주\)|\(유\)|유한회사|\s|\(|\)', '', name)
+    return name.lower()
 
 
-def _crawl_by_company_id(company_id: int, company_name: str) -> list[dict]:
+def _company_matches(found: str, searched: str) -> bool:
+    f = _normalize_co(found)
+    s = _normalize_co(searched)
+    return bool(f and s and (s in f or f in s))
+
+
+def crawl_company(company: str) -> list[dict]:
     today = datetime.today().strftime("%Y-%m-%d")
     jobs = []
     offset = 0
@@ -40,7 +31,7 @@ def _crawl_by_company_id(company_id: int, company_name: str) -> list[dict]:
             resp = requests.get(
                 "https://www.wanted.co.kr/api/v4/jobs",
                 params={
-                    "company_ids[]": company_id,
+                    "query": company,
                     "country": "kr",
                     "job_sort": "job.latest_order",
                     "limit": 20,
@@ -56,6 +47,9 @@ def _crawl_by_company_id(company_id: int, company_name: str) -> list[dict]:
             if not items:
                 break
             for item in items:
+                found_company = item.get("company", {}).get("name", "")
+                if not _company_matches(found_company, company):
+                    continue
                 job_id = item.get("id")
                 title = item.get("position", "")
                 career = item.get("experience_level", {}).get("name", "")
@@ -63,7 +57,7 @@ def _crawl_by_company_id(company_id: int, company_name: str) -> list[dict]:
                 deadline = (item.get("due_time") or "")[:10]
                 jobs.append({
                     "수집일": today,
-                    "회사명": company_name,
+                    "회사명": found_company,
                     "포지션명": title,
                     "직무": "",
                     "경력": career,
@@ -80,16 +74,9 @@ def _crawl_by_company_id(company_id: int, company_name: str) -> list[dict]:
                 break
             time.sleep(0.5)
         except Exception as e:
-            print(f"  [원티드] {company_name} 조회 오류: {e}")
+            print(f"  [원티드] {company} 조회 오류: {e}")
             break
     return jobs
-
-
-def crawl_company(company: str) -> list[dict]:
-    company_id = _get_company_id(company)
-    if not company_id:
-        return []
-    return _crawl_by_company_id(company_id, company)
 
 
 def crawl(companies: list[str]) -> list[dict]:

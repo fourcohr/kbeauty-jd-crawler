@@ -38,13 +38,31 @@ function buildResponse() {
   oneWeekAgo.setDate(today.getDate() - 7);
   const weeklyRange = `${formatDate(oneWeekAgo)} – ${formatDate(today)}`;
 
-  // 주간 공고 필터
+  // 주간 공고 필터 (KPI용)
   const weeklyJobs = rawData
     .filter(r => {
       const d = new Date(r["공고등록일"] || r["수집일"]);
       return d >= oneWeekAgo;
     })
     .slice(0, 200)
+    .map(r => ({
+      직무: r["직무"] || "기타",
+      브랜드: r["회사명"] || "",
+      포지션명: r["포지션명"] || "",
+      경력: r["경력"] || "",
+      플랫폼: r["플랫폼"] || "",
+      등록일: r["공고등록일"] || r["수집일"] || "",
+      URL: r["URL"] || "#",
+    }));
+
+  // 전체 공고 (HTML 클라이언트 날짜 필터용, 최근 90일)
+  const ninetyDaysAgo = new Date(today);
+  ninetyDaysAgo.setDate(today.getDate() - 90);
+  const allJobs = rawData
+    .filter(r => {
+      const d = new Date(r["공고등록일"] || r["수집일"]);
+      return d >= ninetyDaysAgo;
+    })
     .map(r => ({
       직무: r["직무"] || "기타",
       브랜드: r["회사명"] || "",
@@ -148,6 +166,7 @@ function buildResponse() {
     },
     weeklyRange,
     weeklyJobs,
+    allJobs,
     targetPositions,
     risingPositions,
     monthlyJobStats,

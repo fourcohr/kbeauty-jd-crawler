@@ -17,6 +17,17 @@ HEADERS = {
 BASE_URL = "https://www.saramin.co.kr/zf_user/search/recruit"
 
 
+def _normalize_co(name: str) -> str:
+    name = re.sub(r'주식회사|㈜|\(주\)|\(유\)|유한회사|\s|\(|\)', '', name)
+    return name.lower()
+
+
+def _company_matches(found: str, searched: str) -> bool:
+    f = _normalize_co(found)
+    s = _normalize_co(searched)
+    return bool(f and s and (s in f or f in s))
+
+
 def _parse_jobs(soup, company_name: str, today: str) -> list[dict]:
     jobs = []
     items = soup.select(".item_recruit")
@@ -91,6 +102,8 @@ def crawl_company(company: str) -> list[dict]:
             page_jobs = _parse_jobs(soup, company, today)
             if not page_jobs:
                 break
+            # 검색한 회사명과 실제로 일치하는 공고만 유지
+            page_jobs = [j for j in page_jobs if _company_matches(j["회사명"], company)]
             jobs.extend(page_jobs)
             time.sleep(1)
         except Exception as e:

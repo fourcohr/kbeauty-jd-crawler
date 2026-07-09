@@ -135,6 +135,9 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#f0f
 
 /* FILTER BAR */
 .filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.range-btn{padding:4px 11px;border:1px solid #e2e8f0;border-radius:20px;background:white;font-size:0.73rem;font-weight:600;cursor:pointer;color:#64748b;transition:all .15s;}
+.range-btn:hover{border-color:#3b82f6;color:#3b82f6;}
+.range-btn.active{background:#3b82f6;border-color:#3b82f6;color:white;}
 .filter-bar select,.filter-bar input{padding:5px 9px;border:1px solid #e2e8f0;border-radius:7px;font-size:0.77rem;background:white;font-family:inherit;}
 .filter-bar label{font-size:0.77rem;color:#718096;font-weight:600;}
 .filter-count{font-size:0.75rem;color:#718096;margin-left:auto;}
@@ -223,12 +226,25 @@ body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#f0f
     ⚠️ <strong>데모 데이터로 표시 중입니다.</strong> Google Sheets 연동 후 실제 수집 데이터가 표시됩니다. (APPS_SCRIPT_URL 설정 필요)
   </div>
 
-  <!-- 이번 주 신규 공고 -->
+  <!-- 신규 공고 -->
   <div class="sec">
     <div class="sec-header">
       <span class="sec-num-blue">신규</span>
-      <span class="sec-title">이번 주 신규 공고</span>
-      <span class="sec-sub" id="weekly-range">— 집계 기간 로딩 중</span>
+      <span class="sec-title" id="weekly-title">공고 현황</span>
+      <span class="sec-sub" id="weekly-range"></span>
+    </div>
+    <!-- 기간 선택 -->
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+      <span style="font-size:.75rem;font-weight:700;color:#4a5568">기간</span>
+      <button class="range-btn active" id="rb-week"  onclick="setDateRange('week')" >이번 주</button>
+      <button class="range-btn"        id="rb-month" onclick="setDateRange('month')">이번 달</button>
+      <button class="range-btn"        id="rb-3m"    onclick="setDateRange('3month')">최근 3개월</button>
+      <button class="range-btn"        id="rb-all"   onclick="setDateRange('all')"  >전체</button>
+      <span style="font-size:.75rem;color:#94a3b8;margin:0 4px">|</span>
+      <span style="font-size:.75rem;color:#4a5568">직접 설정</span>
+      <input type="date" id="wf-from" onchange="setDateRange('custom')" style="font-size:.75rem;border:1px solid #e2e8f0;border-radius:6px;padding:3px 7px;">
+      <span style="font-size:.75rem;color:#64748b">~</span>
+      <input type="date" id="wf-to"   onchange="setDateRange('custom')" style="font-size:.75rem;border:1px solid #e2e8f0;border-radius:6px;padding:3px 7px;">
     </div>
     <div class="filter-bar">
       <label>직무</label><select id="wf-job" onchange="renderWeeklyTable()"><option value="">전체</option></select>
@@ -654,27 +670,72 @@ function renderCoverKPIs() {
 // WEEKLY TABLE
 // ──────────────────────────────────────────
 function buildWeeklyFilters() {
-  const J = D.weeklyJobs;
+  const J = D.allJobs || D.weeklyJobs;
   fillSelect('wf-job',      [...new Set(J.map(r=>r.직무).filter(Boolean))].sort());
   fillSelect('wf-brand',    [...new Set(J.map(r=>r.브랜드).filter(Boolean))].sort());
   fillSelect('wf-platform', [...new Set(J.map(r=>r.플랫폼).filter(Boolean))].sort());
+  // 기본 기간: 이번 주
+  setDateRange('week');
+}
+
+function setDateRange(type) {
+  const today = new Date();
+  let from, to = today;
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+  if (type === 'week') {
+    from = new Date(today); from.setDate(today.getDate() - 7);
+  } else if (type === 'month') {
+    from = new Date(today.getFullYear(), today.getMonth(), 1);
+  } else if (type === '3month') {
+    from = new Date(today); from.setMonth(today.getMonth() - 3);
+  } else if (type === 'all') {
+    from = new Date('2020-01-01');
+  } else {
+    // custom: 날짜 input에서 직접 읽음
+    ['rb-week','rb-month','rb-3m','rb-all'].forEach(id => document.getElementById(id).classList.remove('active'));
+    renderWeeklyTable(); return;
+  }
+
+  document.getElementById('wf-from').value = fmt(from);
+  document.getElementById('wf-to').value   = fmt(to);
+
+  ['rb-week','rb-month','rb-3m','rb-all'].forEach(id => document.getElementById(id).classList.remove('active'));
+  const map = {week:'rb-week', month:'rb-month', '3month':'rb-3m', all:'rb-all'};
+  if (map[type]) document.getElementById(map[type]).classList.add('active');
+
+  renderWeeklyTable();
 }
 
 function renderWeeklyTable() {
-  const J = D.weeklyJobs;
-  const job  = val('wf-job');
+  const J = D.allJobs || D.weeklyJobs;
+  const fromVal = document.getElementById('wf-from').value;
+  const toVal   = document.getElementById('wf-to').value;
+  const from = fromVal ? new Date(fromVal) : null;
+  const to   = toVal   ? new Date(toVal + 'T23:59:59') : null;
+  const job   = val('wf-job');
   const brand = val('wf-brand');
-  const plt  = val('wf-platform');
-  const q    = val('wf-search').toLowerCase();
+  const plt   = val('wf-platform');
+  const q     = val('wf-search').toLowerCase();
 
   const filtered = J.filter(r => {
-    if (job   && r.직무 !== job) return false;
+    if (from || to) {
+      const d = new Date(r.등록일);
+      if (from && d < from) return false;
+      if (to   && d > to)   return false;
+    }
+    if (job   && r.직무   !== job)   return false;
     if (brand && r.브랜드 !== brand) return false;
-    if (plt   && r.플랫폼 !== plt) return false;
+    if (plt   && r.플랫폼 !== plt)   return false;
     if (q && !`${r.포지션명} ${r.브랜드}`.toLowerCase().includes(q)) return false;
     return true;
   });
 
+  // 헤더 기간 텍스트 업데이트
+  if (fromVal && toVal) {
+    set('weekly-range', `— ${fromVal.replace(/-/g,'.')} ~ ${toVal.replace(/-/g,'.')}`);
+  }
   set('weekly-count', `${filtered.length}건`);
 
   document.getElementById('weeklyTbody').innerHTML = filtered.map(r => `
@@ -693,7 +754,7 @@ function renderWeeklyTable() {
 function clearWeeklyFilters() {
   ['wf-job','wf-brand','wf-platform'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('wf-search').value = '';
-  renderWeeklyTable();
+  setDateRange('week');
 }
 
 // ──────────────────────────────────────────
