@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[포컴퍼니] K-뷰티 채용 트렌드 리포트 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#f0f3f8;color:#1a202c;font-size:13px;}
+
+/* COVER */
+.cover{background:linear-gradient(140deg,#0d1b2a 0%,#1b2e4b 55%,#0f3460 100%);color:white;padding:28px 48px 20px;}
+.cover-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.cover-title{font-size:1.5rem;font-weight:800;letter-spacing:-0.5px;}
+.cover-title em{color:#f6c344;font-style:normal;}
+.cover-sub{font-size:0.8rem;color:#94a3b8;margin-top:4px;}
+.cover-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;}
+.badge-red{background:#e94560;}
+.badge-gray{background:#334155;color:#94a3b8;}
+.badge-teal{background:#0d9488;color:white;}
+.update-info{font-size:0.72rem;color:#64748b;margin-top:5px;}
+.refresh-btn{background:#1d4ed8;color:white;border:none;padding:6px 14px;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background .2s;}
+.refresh-btn:hover{background:#2563eb;}
+.refresh-btn:disabled{background:#334155;cursor:not-allowed;}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.kpi{background:rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;border-top:3px solid var(--c);}
+.kpi-label{font-size:0.67rem;color:#94a3b8;margin-bottom:4px;font-weight:500;}
+.kpi-value{font-size:1.6rem;font-weight:800;color:var(--c);line-height:1;}
+.kpi-unit{font-size:0.75rem;}
+.kpi-note{font-size:0.65rem;color:#64748b;margin-top:3px;}
+
+/* TABS */
+.tab-nav{display:flex;background:#1e293b;padding:0 48px;gap:0;}
+.tab-btn{padding:11px 24px;border:none;background:transparent;color:#64748b;font-size:0.82rem;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;font-family:inherit;}
+.tab-btn.active{color:#f6c344;border-bottom-color:#f6c344;}
+.tab-btn:hover{color:#e2e8f0;}
+.tab-content{display:none;padding:24px 48px 60px;}
+.tab-content.active{display:block;}
+
+/* SECTION */
+.sec{margin-top:28px;}
+.sec-header{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;}
+.sec-num{font-size:0.72rem;font-weight:800;color:#e94560;background:#fff0f3;padding:3px 9px;border-radius:10px;}
+.sec-num-teal{font-size:0.72rem;font-weight:800;color:#0d9488;background:#f0fdfa;padding:3px 9px;border-radius:10px;}
+.sec-num-blue{font-size:0.72rem;font-weight:800;color:#1d4ed8;background:#eff6ff;padding:3px 9px;border-radius:10px;}
+.sec-title{font-size:1.0rem;font-weight:800;color:#1a202c;}
+.sec-sub{font-size:0.75rem;color:#718096;}
+.sub-sec{margin-top:16px;}
+.sub-title{font-size:0.79rem;font-weight:700;color:#4a5568;padding:4px 10px;background:#f7f8fc;border-left:3px solid #e94560;border-radius:0 5px 5px 0;margin-bottom:10px;}
+
+/* CARD */
+.card{background:white;border-radius:12px;padding:16px 18px;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.card-title{font-size:0.82rem;font-weight:700;color:#2d3748;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:14px;}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:14px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:0.76rem;}
+.tbl th{background:#f7f8fc;color:#4a5568;font-weight:700;padding:7px 8px;text-align:center;border-bottom:2px solid #e2e8f0;white-space:nowrap;font-size:0.71rem;}
+.tbl td{padding:6px 8px;text-align:center;border-bottom:1px solid #f0f2f5;color:#2d3748;}
+.tbl tr:hover td{background:#fafbff;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl td.L{text-align:left;}
+.tbl-scroll{overflow-y:auto;}
+.tbl-scroll-300{max-height:300px;overflow-y:auto;}
+.tbl-scroll-420{max-height:420px;overflow-y:auto;}
+.scroll-x{overflow-x:auto;}
+
+/* BADGES */
+.g{display:inline-block;padding:2px 8px;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;}
+.g-rising{background:#fef3c7;color:#92400e;}
+.g-target{background:#fee2e2;color:#991b1b;}
+.g-new{background:#dcfce7;color:#166534;}
+.g-none{background:#f1f5f9;color:#94a3b8;}
+.plt-saramin{background:#e0f2fe;color:#0369a1;padding:2px 7px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+.plt-wanted{background:#fce7f3;color:#9d174d;padding:2px 7px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+.plt-jobkorea{background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+.plt-google{background:#f0fdf4;color:#166534;padding:2px 7px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+.plt-homepage{background:#f5f3ff;color:#5b21b6;padding:2px 7px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+
+/* INSIGHT BOX */
+.ins{border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;gap:9px;}
+.ins-r{background:#fff5f5;border-left:3px solid #e94560;}
+.ins-y{background:#fffbeb;border-left:3px solid #f6c344;}
+.ins-b{background:#eff6ff;border-left:3px solid #3b82f6;}
+.ins-g{background:#f0fdf4;border-left:3px solid #22c55e;}
+.ins-p{background:#faf5ff;border-left:3px solid #8b5cf6;}
+.ins-t{background:#f0fdfa;border-left:3px solid #0d9488;}
+.ins-icon{font-size:0.9rem;flex-shrink:0;margin-top:1px;}
+.ins-title{font-size:0.79rem;font-weight:700;color:#1a202c;margin-bottom:2px;}
+.ins-desc{font-size:0.74rem;color:#4a5568;line-height:1.55;}
+.ins-desc strong{color:#1a202c;font-weight:700;}
+
+/* HR INSIGHT BOX */
+.hr-insight-box{margin-top:16px;background:#fffbeb;border:1.5px dashed #f6c344;border-radius:10px;padding:14px 16px;}
+.hr-insight-label{font-size:0.82rem;font-weight:800;color:#92400e;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.hr-insight-area{width:100%;border:1px solid #fde68a;border-radius:6px;padding:10px;font-size:0.79rem;color:#1a202c;background:#fffdf5;resize:vertical;min-height:80px;font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;line-height:1.65;}
+.hr-insight-area:focus{outline:none;border-color:#f6c344;box-shadow:0 0 0 2px #fef3c7;}
+.hr-insight-meta{font-size:0.68rem;color:#a78bfa;margin-top:4px;text-align:right;}
+.save-btn{background:#059669;color:white;border:none;padding:5px 12px;border-radius:7px;font-size:0.73rem;font-weight:700;cursor:pointer;margin-top:6px;}
+.save-btn:hover{background:#047857;}
+
+/* AI BOX */
+.ai-box{background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:10px;padding:14px 16px;margin-top:8px;}
+.ai-box-title{font-size:0.82rem;font-weight:800;color:#0369a1;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+/* POSITION CARDS */
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px;}
+.pos-card{background:white;border-radius:10px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.07);border-left:4px solid var(--bc,#f6c344);}
+.pos-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.pos-name{font-size:0.92rem;font-weight:800;color:#1a202c;}
+.pos-cat{font-size:0.7rem;color:#718096;margin-top:2px;}
+.pos-meta{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.72rem;margin-top:8px;}
+.pos-meta-row{display:flex;flex-direction:column;}
+.pos-meta-key{color:#94a3b8;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.pos-meta-val{color:#2d3748;font-weight:600;margin-top:1px;}
+.pos-companies{margin-top:8px;padding-top:8px;border-top:1px solid #f0f2f5;font-size:0.71rem;color:#64748b;}
+
+/* TREND BARS */
+.trend-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.trend-label{font-size:0.75rem;font-weight:700;color:#4a5568;min-width:90px;}
+.trend-bar-bg{flex:1;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;}
+.trend-bar-fill{height:100%;border-radius:4px;background:var(--c,#3b82f6);transition:width .5s;}
+.trend-count{font-size:0.72rem;font-weight:800;color:var(--c,#3b82f6);min-width:40px;text-align:right;}
+.trend-change{font-size:0.68rem;min-width:50px;text-align:right;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.filter-bar select,.filter-bar input{padding:5px 9px;border:1px solid #e2e8f0;border-radius:7px;font-size:0.77rem;background:white;font-family:inherit;}
+.filter-bar label{font-size:0.77rem;color:#718096;font-weight:600;}
+.filter-count{font-size:0.75rem;color:#718096;margin-left:auto;}
+
+/* STAT MINI CARDS */
+.mini-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;}
+.mini-kpi-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.mini-kpi{background:white;border-radius:8px;padding:10px 12px;text-align:center;box-shadow:0 1px 5px rgba(0,0,0,.05);border-top:3px solid var(--c,#3b82f6);}
+.mini-kpi-label{font-size:0.67rem;color:#718096;margin-bottom:3px;}
+.mini-kpi-val{font-size:1.3rem;font-weight:800;color:var(--c,#3b82f6);font-variant-numeric:tabular-nums;}
+.mini-kpi-note{font-size:0.63rem;color:#a0aec0;margin-top:2px;}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:rgba(15,26,64,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:white;}
+#loading h2{font-size:1.1rem;margin-bottom:6px;}
+#loading p{font-size:0.8rem;color:#94a3b8;}
+.spinner{width:38px;height:38px;border:4px solid #334155;border-top-color:#f6c344;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* SKILL TAG */
+.skill-tag{display:inline-block;background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:12px;font-size:0.68rem;font-weight:600;margin:2px;}
+.skill-tag.up{background:#dcfce7;color:#166534;}
+.skill-tag.hot{background:#fee2e2;color:#991b1b;}
+
+/* DP/DN/DG */
+.dp{color:#dc2626;font-weight:700;}
+.dn{color:#2563eb;font-weight:700;}
+.dg{color:#16a34a;font-weight:700;}
+
+/* FOOTER */
+.footer{text-align:center;padding:18px;color:#a0aec0;font-size:0.7rem;border-top:1px solid #e2e8f0;}
+
+/* NOTICE */
+.demo-banner{background:#fffbeb;border:1px solid #f6c344;border-radius:8px;padding:10px 13px;margin-bottom:14px;display:flex;gap:9px;font-size:0.77rem;color:#744210;line-height:1.6;}
+
+@media print{#loading,.tab-nav,.refresh-btn,.save-btn,.filter-bar button{display:none!important;}.tab-content{display:block!important;page-break-after:always;}}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <h2>데이터 불러오는 중...</h2>
+  <p>K-뷰티 채용 트렌드 DB를 불러오고 있습니다</p>
+</div>
+
+<!-- ── COVER ── -->
+<div class="cover">
+  <div class="cover-top">
+    <div>
+      <div class="cover-title">[포컴퍼니] <em>K-뷰티 채용 트렌드</em> 리포트 2026</div>
+      <div class="cover-sub" style="font-size:.83rem;color:#e2e8f0;margin-top:3px;font-weight:600">라이징 포지션 발굴 · 타겟 포지션 모니터링 · 경쟁사 채용 동향</div>
+      <div class="cover-sub">직무 기반 K-뷰티 채용 트렌드 자동 분석 | 사람인·잡코리아·원티드·타사 홈페이지</div>
+    </div>
+    <div style="text-align:right">
+      <div class="cover-badges">
+        <span class="badge badge-red">CONFIDENTIAL · 인사문화팀</span>
+        <span class="badge badge-teal">K-뷰티 90개사 수집</span>
+        <button class="refresh-btn" id="refreshBtn" onclick="loadData()">🔄 새로고침</button>
+      </div>
+      <div class="update-info" id="updateTime">⏱ 마지막 업데이트: 로딩 중...</div>
+      <div class="update-info">📊 매일 자동 크롤링 | Google Sheets 연동</div>
+    </div>
+  </div>
+  <div class="kpi-strip" id="kpiStrip">
+    <div class="kpi" style="--c:#f6c344"><div class="kpi-label">총 수집 공고</div><div class="kpi-value" id="k-total">-<span class="kpi-unit">건</span></div><div class="kpi-note" id="k-total-n">누적 전체</div></div>
+    <div class="kpi" style="--c:#22c55e"><div class="kpi-label">이번 주 신규</div><div class="kpi-value" id="k-week">-<span class="kpi-unit">건</span></div><div class="kpi-note">전주 대비 <span id="k-week-diff">-</span></div></div>
+    <div class="kpi" style="--c:#e94560"><div class="kpi-label">타겟 포지션</div><div class="kpi-value" id="k-target">-<span class="kpi-unit">개</span></div><div class="kpi-note">1주 10건↑ 포지션</div></div>
+    <div class="kpi" style="--c:#f59e0b"><div class="kpi-label">라이징 포지션</div><div class="kpi-value" id="k-rising">-<span class="kpi-unit">개</span></div><div class="kpi-note">최근 1개월 내 첫 등장</div></div>
+    <div class="kpi" style="--c:#8b5cf6"><div class="kpi-label">수집 브랜드</div><div class="kpi-value" id="k-brands">-<span class="kpi-unit">개</span></div><div class="kpi-note">활성 채용 중</div></div>
+  </div>
+</div>
+
+<!-- ── TAB NAV ── -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('weekly',this)">📋 Weekly 트렌드</button>
+  <button class="tab-btn" onclick="switchTab('monthly',this)">📊 Monthly 분석</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 1: WEEKLY
+════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-weekly">
+
+  <div id="demo-banner-weekly" class="demo-banner" style="display:none">
+    ⚠️ <strong>데모 데이터로 표시 중입니다.</strong> Google Sheets 연동 후 실제 수집 데이터가 표시됩니다. (APPS_SCRIPT_URL 설정 필요)
+  </div>
+
+  <!-- 이번 주 신규 공고 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num-blue">신규</span>
+      <span class="sec-title">이번 주 신규 공고</span>
+      <span class="sec-sub" id="weekly-range">— 집계 기간 로딩 중</span>
+    </div>
+    <div class="filter-bar">
+      <label>직무</label><select id="wf-job" onchange="renderWeeklyTable()"><option value="">전체</option></select>
+      <label>브랜드</label><select id="wf-brand" onchange="renderWeeklyTable()"><option value="">전체</option></select>
+      <label>플랫폼</label><select id="wf-platform" onchange="renderWeeklyTable()"><option value="">전체</option></select>
+      <input type="text" id="wf-search" placeholder="포지션명·브랜드 검색..." oninput="renderWeeklyTable()" style="min-width:160px">
+      <button onclick="clearWeeklyFilters()" style="padding:5px 10px;border:1px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.75rem">초기화</button>
+      <span class="filter-count" id="weekly-count"></span>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="tbl-scroll-420 scroll-x">
+        <table class="tbl" id="weeklyTable">
+          <thead>
+            <tr>
+              <th>직무</th><th>브랜드</th><th>포지션명</th><th>경력</th><th>플랫폼</th><th>등록일</th><th>링크</th>
+            </tr>
+          </thead>
+          <tbody id="weeklyTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 타겟 포지션 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num">타겟</span>
+      <span class="sec-title">타겟 포지션 현황</span>
+      <span class="sec-sub">1주 내 10건 이상 등록 — 선제적 인재풀 확보 필요</span>
+    </div>
+    <div id="targetSection"></div>
+    <div class="ai-box" style="margin-top:14px">
+      <div class="ai-box-title">🤖 AI 제언 — 타겟 포지션</div>
+      <div id="ai-target"></div>
+    </div>
+    <div class="hr-insight-box">
+      <div class="hr-insight-label">📝 채용담당자 의견 — 타겟 포지션</div>
+      <textarea class="hr-insight-area" id="hr-w1" placeholder="타겟 포지션에 대한 선제 대응 전략, 내부 보유 인재풀 현황, 채용 계획 등을 입력하세요..."></textarea>
+      <button class="save-btn" onclick="saveNote('hr-w1')">저장</button>
+      <div class="hr-insight-meta" id="hr-w1-meta"></div>
+    </div>
+  </div>
+
+  <!-- 라이징 포지션 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num" style="background:#fffbeb;color:#92400e;">라이징</span>
+      <span class="sec-title">라이징 포지션 발굴</span>
+      <span class="sec-sub">최근 1개월 내 K-뷰티 업계에서 처음 등장한 포지션</span>
+    </div>
+    <div class="pos-grid" id="risingGrid"></div>
+    <div class="ai-box" style="margin-top:14px">
+      <div class="ai-box-title">🤖 AI 제언 — 라이징 포지션</div>
+      <div id="ai-rising"></div>
+    </div>
+    <div class="hr-insight-box">
+      <div class="hr-insight-label">📝 채용담당자 의견 — 라이징 포지션</div>
+      <textarea class="hr-insight-area" id="hr-w2" placeholder="라이징 포지션 중 포컴퍼니 내 도입 검토 여부, 유사 역할 보유 현황, 인재풀 선제 확보 계획 등을 입력하세요..."></textarea>
+      <button class="save-btn" onclick="saveNote('hr-w2')">저장</button>
+      <div class="hr-insight-meta" id="hr-w2-meta"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 2: MONTHLY
+════════════════════════════════════════ -->
+<div class="tab-content" id="tab-monthly">
+
+  <div id="demo-banner-monthly" class="demo-banner" style="display:none">
+    ⚠️ <strong>데모 데이터로 표시 중입니다.</strong> Google Sheets 연동 후 실제 수집 데이터가 표시됩니다.
+  </div>
+
+  <!-- 직무별 채용 빈도 -->
+  <div class="sec" style="margin-top:20px">
+    <div class="sec-header">
+      <span class="sec-num-blue">01</span>
+      <span class="sec-title">직무별 채용 빈도 현황</span>
+      <span class="sec-sub">K-뷰티 전체 | 이번 달 누적</span>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📊 직무별 공고 건수</div>
+        <div style="position:relative;height:240px"><canvas id="jobFreqChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 직무별 전월 대비 증감</div>
+        <div id="jobTrendBars"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">🏆 이번 달 TOP 3 직무</div>
+      <div id="top3Jobs"></div>
+    </div>
+  </div>
+
+  <!-- 타겟 포지션 TOP5 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num">02</span>
+      <span class="sec-title">타겟 포지션 TOP 5</span>
+      <span class="sec-sub">월간 채용 수요 급증 포지션 — 인재풀 선제 확보 필요</span>
+    </div>
+    <div id="targetTop5"></div>
+    <div class="ai-box">
+      <div class="ai-box-title">🤖 AI 제언 — 타겟 포지션 TOP 5</div>
+      <div id="ai-m-target"></div>
+    </div>
+    <div class="hr-insight-box">
+      <div class="hr-insight-label">📝 채용담당자 의견 — 타겟 포지션</div>
+      <textarea class="hr-insight-area" id="hr-m1" placeholder="타겟 포지션 TOP5에 대한 월간 의견 및 액션플랜을 입력하세요..."></textarea>
+      <button class="save-btn" onclick="saveNote('hr-m1')">저장</button>
+      <div class="hr-insight-meta" id="hr-m1-meta"></div>
+    </div>
+  </div>
+
+  <!-- 라이징 포지션 리스트업 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num" style="background:#fffbeb;color:#92400e;">03</span>
+      <span class="sec-title">라이징 포지션 월간 리스트업</span>
+      <span class="sec-sub">이번 달 처음 등장한 포지션 전체</span>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="scroll-x">
+        <table class="tbl" id="risingMonthlyTable">
+          <thead>
+            <tr><th>포지션명</th><th>직무</th><th>첫 등장일</th><th>이번달 건수</th><th>주요 등장 브랜드</th><th>분류</th></tr>
+          </thead>
+          <tbody id="risingMonthlyTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="hr-insight-box">
+      <div class="hr-insight-label">📝 채용담당자 의견 — 라이징 포지션 리스트</div>
+      <textarea class="hr-insight-area" id="hr-m2" placeholder="이번 달 라이징 포지션에 대한 관찰 내용 및 포컴퍼니 연관성 분석을 입력하세요..."></textarea>
+      <button class="save-btn" onclick="saveNote('hr-m2')">저장</button>
+      <div class="hr-insight-meta" id="hr-m2-meta"></div>
+    </div>
+  </div>
+
+  <!-- 브랜드별 채용 현황 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num-teal">04</span>
+      <span class="sec-title">브랜드별 채용 현황</span>
+      <span class="sec-sub">경영실적 상위 30개사 | 이번 달 기준</span>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🏢 채용 공고 TOP 10 브랜드</div>
+        <div style="position:relative;height:240px"><canvas id="brandChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 상위 30개사 채용 현황</div>
+        <div class="tbl-scroll-300">
+          <table class="tbl" id="brandTable">
+            <thead><tr><th>순위</th><th>브랜드</th><th>이번달</th><th>전월</th><th>증감</th><th>주요 직무</th></tr></thead>
+            <tbody id="brandTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스킬 키워드 트렌드 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num-blue">05</span>
+      <span class="sec-title">스킬 키워드 트렌드</span>
+      <span class="sec-sub">자격요건 내 등장 빈도 기준 | 전월 대비</span>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🔥 급상승 키워드 TOP 10</div>
+        <div id="skillUpList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📉 하락 키워드</div>
+        <div id="skillDownList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI 종합 제언 -->
+  <div class="sec">
+    <div class="sec-header">
+      <span class="sec-num" style="background:#f0f9ff;color:#0369a1;">06 🤖</span>
+      <span class="sec-title">AI 종합 제언</span>
+      <span class="sec-sub">데이터 기반 자동 분석 — 매 새로고침 시 업데이트</span>
+    </div>
+    <div class="ai-box">
+      <div class="ai-box-title">🤖 이번 달 채용 트렌드 AI 분석 요약</div>
+      <div id="ai-monthly-summary"></div>
+    </div>
+    <div class="hr-insight-box">
+      <div class="hr-insight-label">📝 채용담당자 월간 종합 분석</div>
+      <textarea class="hr-insight-area" id="hr-m3" rows="6" placeholder="월간 K-뷰티 채용 트렌드 분석 및 포컴퍼니 채용 전략 반영 방안을 입력하세요...&#10;&#10;예) 1. 이달의 주요 인사이트 / 2. 포컴퍼니 채용에 반영할 사항 / 3. 다음달 주시할 포지션"></textarea>
+      <button class="save-btn" onclick="saveNote('hr-m3')">저장</button>
+      <div class="hr-insight-meta" id="hr-m3-meta"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">ⓒ 2026 포컴퍼니 인사문화팀 &nbsp;|&nbsp; CONFIDENTIAL &nbsp;|&nbsp; K-뷰티 채용 트렌드 자동 수집 시스템</div>
+
+<script>
+// ──────────────────────────────────────────
+// CONFIG — Apps Script 배포 URL로 교체
+// ──────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHfNbnCPwLtLOlY46uN3NgIILwR-Uo2vCWDkVQHKlEVCyLb0fDvMcVbL_cGMUJfyo6og/exec';
+
+// ──────────────────────────────────────────
+// DEMO DATA (Apps Script 미설정 시 사용)
+// ──────────────────────────────────────────
+const DEMO_DATA = {
+  updatedAt: new Date().toISOString(),
+  summary: { totalJobs: 3284, newThisWeek: 147, weekDiff: '+23', targetCount: 3, risingCount: 6, activeBrands: 72 },
+  weeklyRange: '2026.06.16 – 2026.06.22',
+  weeklyJobs: [
+    {직무:'마케팅',브랜드:'에이피알',포지션명:'퍼포먼스마케터',경력:'3~7년',플랫폼:'원티드',등록일:'2026-06-21',URL:'#'},
+    {직무:'마케팅',브랜드:'달바글로벌',포지션명:'글로벌 브랜드마케터',경력:'4년↑',플랫폼:'사람인',등록일:'2026-06-21',URL:'#'},
+    {직무:'마케팅',브랜드:'코스알엑스',포지션명:'SNS 콘텐츠 마케터',경력:'2~5년',플랫폼:'원티드',등록일:'2026-06-20',URL:'#'},
+    {직무:'마케팅',브랜드:'클리오',포지션명:'디지털마케팅 담당자',경력:'3년↑',플랫폼:'잡코리아',등록일:'2026-06-20',URL:'#'},
+    {직무:'마케팅',브랜드:'에이피알',포지션명:'GTM Manager',경력:'5년↑',플랫폼:'홈페이지',등록일:'2026-06-19',URL:'#'},
+    {직무:'영업',브랜드:'아모레퍼시픽',포지션명:'해외영업 담당자 (미주)',경력:'3~8년',플랫폼:'사람인',등록일:'2026-06-21',URL:'#'},
+    {직무:'영업',브랜드:'LG생활건강',포지션명:'글로벌 세일즈매니저',경력:'5년↑',플랫폼:'잡코리아',등록일:'2026-06-20',URL:'#'},
+    {직무:'영업',브랜드:'실리콘투',포지션명:'K-뷰티 수출 영업',경력:'2~5년',플랫폼:'사람인',등록일:'2026-06-19',URL:'#'},
+    {직무:'디자인',브랜드:'달바글로벌',포지션명:'패키지 디자이너',경력:'3~6년',플랫폼:'원티드',등록일:'2026-06-21',URL:'#'},
+    {직무:'디자인',브랜드:'클리오',포지션명:'브랜드 아이덴티티 디자이너',경력:'4년↑',플랫폼:'잡코리아',등록일:'2026-06-20',URL:'#'},
+    {직무:'상품기획',브랜드:'에이피알',포지션명:'스킨케어 PD',경력:'3~7년',플랫폼:'홈페이지',등록일:'2026-06-21',URL:'#'},
+    {직무:'상품기획',브랜드:'아모레퍼시픽',포지션명:'색조 카테고리 MD',경력:'4년↑',플랫폼:'사람인',등록일:'2026-06-20',URL:'#'},
+    {직무:'기획',브랜드:'코스알엑스',포지션명:'사업기획 담당자',경력:'3~6년',플랫폼:'원티드',등록일:'2026-06-19',URL:'#'},
+    {직무:'SCM',브랜드:'LG생활건강',포지션명:'글로벌 SCM 플래너',경력:'3~7년',플랫폼:'잡코리아',등록일:'2026-06-21',URL:'#'},
+    {직무:'SCM',브랜드:'한국콜마',포지션명:'구매 담당자',경력:'2~5년',플랫폼:'사람인',등록일:'2026-06-20',URL:'#'},
+    {직무:'제품개발',브랜드:'한국콜마',포지션명:'스킨케어 제형 연구원',경력:'3년↑',플랫폼:'잡코리아',등록일:'2026-06-21',URL:'#'},
+    {직무:'제품개발',브랜드:'코스맥스',포지션명:'색조 제형 연구원',경력:'2~6년',플랫폼:'사람인',등록일:'2026-06-20',URL:'#'},
+    {직무:'경영관리',브랜드:'에이피알',포지션명:'재무기획 담당자 (FP&A)',경력:'4~8년',플랫폼:'홈페이지',등록일:'2026-06-19',URL:'#'},
+    {직무:'마케팅',브랜드:'토니모리',포지션명:'인플루언서 마케터',경력:'2~4년',플랫폼:'잡코리아',등록일:'2026-06-18',URL:'#'},
+    {직무:'기획',브랜드:'달바글로벌',포지션명:'MI(Market Intelligence) 분석가',경력:'3~6년',플랫폼:'홈페이지',등록일:'2026-06-18',URL:'#'},
+  ],
+  targetPositions: [
+    {포지션명:'퍼포먼스마케터',직무:'마케팅',주간건수:23,전월주간평균:14,전주건수:18,주요브랜드:['에이피알','달바글로벌','클리오','토니모리','코스알엑스']},
+    {포지션명:'해외영업',직무:'영업',주간건수:18,전월주간평균:11,전주건수:15,주요브랜드:['아모레퍼시픽','LG생활건강','실리콘투','구다이글로벌']},
+    {포지션명:'글로벌 SCM 플래너',직무:'SCM',주간건수:12,전월주간평균:6,전주건수:9,주요브랜드:['LG생활건강','한국콜마','코스맥스','아모레퍼시픽']},
+  ],
+  risingPositions: [
+    {포지션명:'GTM Manager',직무:'마케팅',첫등장:'2026-06-03',이번달건수:11,주요브랜드:['에이피알','코스알엑스','달바글로벌'],설명:'Go-to-Market 전략 수립 및 신시장 진입 담당. 글로벌 확장 가속화에 따라 급증'},
+    {포지션명:'MI(Market Intelligence) 분석가',직무:'기획',첫등장:'2026-06-07',이번달건수:8,주요브랜드:['달바글로벌','에이피알','코스알엑스'],설명:'시장 데이터 분석 및 경쟁사 인텔리전스 담당. D2C 전략 강화로 신설 증가'},
+    {포지션명:'D2C Growth Manager',직무:'마케팅',첫등장:'2026-06-10',이번달건수:7,주요브랜드:['에이피알','구다이글로벌','토니모리'],설명:'자사몰 중심 고객 획득·성장 전략 담당. 자사몰 채널 확장 트렌드 반영'},
+    {포지션명:'CX(고객경험) 디자이너',직무:'디자인',첫등장:'2026-06-12',이번달건수:6,주요브랜드:['에이피알','달바글로벌','클리오'],설명:'고객 여정 전반의 경험 설계 담당. 디지털 커머스 고도화에 따라 등장'},
+    {포지션명:'글로벌 커뮤니티 매니저',직무:'마케팅',첫등장:'2026-06-14',이번달건수:5,주요브랜드:['코스알엑스','구다이글로벌','달바글로벌'],설명:'해외 팬 커뮤니티 운영 및 UGC 전략 담당. TikTok·Reels 채널 강화 배경'},
+    {포지션명:'FP&A(재무기획분석)',직무:'경영관리',첫등장:'2026-06-16',이번달건수:4,주요브랜드:['에이피알','달바글로벌','실리콘투'],설명:'재무 계획 수립 및 경영진 의사결정 지원. 성장 브랜드의 재무 체계 구축 수요'},
+  ],
+  monthlyJobStats: [
+    {직무:'마케팅',건수:512,전월:441},
+    {직무:'영업',건수:387,전월:312},
+    {직무:'디자인',건수:298,전월:267},
+    {직무:'상품기획',건수:245,전월:198},
+    {직무:'제품개발',건수:234,전월:228},
+    {직무:'SCM',건수:189,전월:134},
+    {직무:'기획',건수:178,전월:156},
+    {직무:'경영관리',건수:145,전월:138},
+    {직무:'제작',건수:98,전월:102},
+    {직무:'직군',건수:67,전월:71},
+  ],
+  brandStats: [
+    {순위:1,브랜드:'아모레퍼시픽',이번달:45,전월:38,주요직무:'마케팅, 제품개발'},
+    {순위:2,브랜드:'LG생활건강',이번달:41,전월:45,주요직무:'영업, SCM'},
+    {순위:3,브랜드:'에이피알',이번달:38,전월:29,주요직무:'마케팅, 기획'},
+    {순위:4,브랜드:'달바글로벌',이번달:31,전월:22,주요직무:'마케팅, 디자인'},
+    {순위:5,브랜드:'한국콜마',이번달:28,전월:31,주요직무:'제품개발, SCM'},
+    {순위:6,브랜드:'코스맥스',이번달:26,전월:24,주요직무:'제품개발, 경영관리'},
+    {순위:7,브랜드:'코스알엑스',이번달:24,전월:17,주요직무:'마케팅, 기획'},
+    {순위:8,브랜드:'클리오',이번달:22,전월:25,주요직무:'디자인, 마케팅'},
+    {순위:9,브랜드:'실리콘투',이번달:19,전월:14,주요직무:'영업, 경영관리'},
+    {순위:10,브랜드:'구다이글로벌',이번달:17,전월:12,주요직무:'마케팅, 상품기획'},
+    {순위:11,브랜드:'토니모리',이번달:15,전월:18,주요직무:'마케팅, 디자인'},
+    {순위:12,브랜드:'에이블씨엔씨',이번달:13,전월:16,주요직무:'디자인, 마케팅'},
+  ],
+  skillTrends: {
+    up: [
+      {키워드:'퍼포먼스마케팅',건수:187,증가율:34},
+      {키워드:'아마존/틱톡샵',건수:143,증가율:28},
+      {키워드:'D2C/자사몰',건수:132,증가율:25},
+      {키워드:'GA4/데이터분석',건수:118,증가율:22},
+      {키워드:'글로벌 커머스',건수:112,증가율:20},
+      {키워드:'숏폼/릴스',건수:98,증가율:18},
+      {키워드:'Go-to-Market',건수:76,증가율:15},
+      {키워드:'세포라/얼타',건수:68,증가율:12},
+      {키워드:'FP&A',건수:54,증가율:11},
+      {키워드:'CRM/고객분석',건수:89,증가율:9},
+    ],
+    down: [
+      {키워드:'오프라인 유통',건수:67,감소율:-18},
+      {키워드:'로드샵 영업',건수:43,감소율:-22},
+      {키워드:'홈쇼핑 운영',건수:38,감소율:-15},
+      {키워드:'카탈로그 제작',건수:21,감소율:-31},
+    ],
+  },
+};
+
+// ──────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────
+let D = null;
+let isDemo = false;
+const charts = {};
+
+// ──────────────────────────────────────────
+// LOAD
+// ──────────────────────────────────────────
+async function loadData() {
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('refreshBtn').disabled = true;
+  if (!APPS_SCRIPT_URL) {
+    D = DEMO_DATA;
+    isDemo = true;
+    document.getElementById('updateTime').textContent = '⏱ 데모 데이터 | Apps Script URL 설정 후 실제 데이터 연결';
+    ['demo-banner-weekly','demo-banner-monthly'].forEach(id => document.getElementById(id).style.display = 'flex');
+    processAll();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('refreshBtn').disabled = false;
+    return;
+  }
+  function fallbackToDemo(reason) {
+    D = DEMO_DATA; isDemo = true;
+    document.getElementById('updateTime').textContent = '⚠️ ' + reason + ' — 데모 데이터 표시 중';
+    ['demo-banner-weekly','demo-banner-monthly'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'flex';
+    });
+    try { processAll(); } catch(err) { console.error('processAll error:', err); }
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('refreshBtn').disabled = false;
+  }
+
+  const cbName = '_jdcb_' + Date.now();
+  const timeout = setTimeout(function() {
+    delete window[cbName];
+    fallbackToDemo('연결 시간 초과');
+  }, 20000);
+
+  window[cbName] = function(data) {
+    clearTimeout(timeout);
+    delete window[cbName];
+    var loader = document.getElementById('script-loader');
+    if (loader) loader.remove();
+    try {
+      D = data;
+      document.getElementById('updateTime').textContent = '⏱ 마지막 업데이트: ' + new Date(D.updatedAt).toLocaleString('ko-KR');
+      processAll();
+    } catch(err) {
+      console.error('processAll error:', err);
+      fallbackToDemo('데이터 처리 오류');
+      return;
+    }
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('refreshBtn').disabled = false;
+  };
+
+  const s = document.createElement('script');
+  s.id = 'script-loader';
+  s.src = APPS_SCRIPT_URL + '?callback=' + cbName + '&t=' + Date.now();
+  s.onerror = function() {
+    clearTimeout(timeout);
+    delete window[cbName];
+    fallbackToDemo('연결 실패');
+  };
+  document.head.appendChild(s);
+}
+
+// 날짜를 YYYY.MM.DD 형식으로 안전하게 변환
+function fmtDate(v) {
+  if (!v || v === '') return '-';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return '-';
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}.${m}.${day}`;
+}
+
+// 신입/인턴/공채 등 일반 채용공고 여부 판별
+const GENERIC_RECRUIT_KW = ['신입','인턴','공채','공개채용','수시채용','수시모집','상반기','하반기','채용전형','대졸'];
+function isGenericRecruit(name) {
+  return GENERIC_RECRUIT_KW.some(kw => name.includes(kw));
+}
+
+function processAll() {
+  renderCoverKPIs();
+  buildWeeklyFilters();
+  renderWeeklyTable();
+  renderTargetSection();
+  renderRisingGrid();
+  renderMonthlyJobStats();
+  renderTargetTop5();
+  renderRisingMonthlyTable();
+  renderBrandSection();
+  renderSkillTrends();
+  generateAI();
+  loadAllNotes();
+}
+
+// ──────────────────────────────────────────
+// COVER KPIs
+// ──────────────────────────────────────────
+function renderCoverKPIs() {
+  const s = D.summary;
+  set('k-total', s.totalJobs.toLocaleString());
+  set('k-total-n', '누적 전체 공고');
+  set('k-week', s.newThisWeek);
+  set('k-week-diff', s.weekDiff + '건');
+  set('k-target', s.targetCount);
+  set('k-rising', s.risingCount);
+  set('k-brands', s.activeBrands);
+  if (D.weeklyRange) set('weekly-range', '— ' + D.weeklyRange);
+}
+
+// ──────────────────────────────────────────
+// WEEKLY TABLE
+// ──────────────────────────────────────────
+function buildWeeklyFilters() {
+  const J = D.weeklyJobs;
+  fillSelect('wf-job',      [...new Set(J.map(r=>r.직무).filter(Boolean))].sort());
+  fillSelect('wf-brand',    [...new Set(J.map(r=>r.브랜드).filter(Boolean))].sort());
+  fillSelect('wf-platform', [...new Set(J.map(r=>r.플랫폼).filter(Boolean))].sort());
+}
+
+function renderWeeklyTable() {
+  const J = D.weeklyJobs;
+  const job  = val('wf-job');
+  const brand = val('wf-brand');
+  const plt  = val('wf-platform');
+  const q    = val('wf-search').toLowerCase();
+
+  const filtered = J.filter(r => {
+    if (job   && r.직무 !== job) return false;
+    if (brand && r.브랜드 !== brand) return false;
+    if (plt   && r.플랫폼 !== plt) return false;
+    if (q && !`${r.포지션명} ${r.브랜드}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  set('weekly-count', `${filtered.length}건`);
+
+  document.getElementById('weeklyTbody').innerHTML = filtered.map(r => `
+    <tr>
+      <td>${jobTag(r.직무)}</td>
+      <td class="L" style="font-weight:700">${r.브랜드}</td>
+      <td class="L">${r.포지션명}</td>
+      <td>${r.경력||'-'}</td>
+      <td>${platformTag(r.플랫폼)}</td>
+      <td>${fmtDate(r.등록일)}</td>
+      <td>${r.URL&&r.URL!=='#'?`<a href="${r.URL}" target="_blank" style="color:#3b82f6;font-size:.71rem">링크</a>`:'-'}</td>
+    </tr>
+  `).join('');
+}
+
+function clearWeeklyFilters() {
+  ['wf-job','wf-brand','wf-platform'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('wf-search').value = '';
+  renderWeeklyTable();
+}
+
+// ──────────────────────────────────────────
+// TARGET POSITIONS
+// ──────────────────────────────────────────
+function renderTargetSection() {
+  const T = D.targetPositions;
+  const max = Math.max(...T.map(t=>t.주간건수), 1);
+  document.getElementById('targetSection').innerHTML = `
+    <div class="mini-kpi-grid-4" style="grid-template-columns:repeat(${Math.min(T.length,4)},1fr)">
+      ${T.map(t=>`
+        <div class="mini-kpi" style="--c:#e94560">
+          <div class="mini-kpi-label">${t.직무}</div>
+          <div class="mini-kpi-val">${t.주간건수}</div>
+          <div class="mini-kpi-note">${t.포지션명}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <table class="tbl">
+        <thead><tr><th>포지션명</th><th>직무</th><th>이번주</th><th>전주</th><th>증감</th><th>전월 주간평균</th><th>주요 브랜드</th></tr></thead>
+        <tbody>${T.map(t=>{
+          const diff = t.주간건수 - t.전주건수;
+          return `<tr>
+            <td class="L" style="font-weight:700">${t.포지션명} <span class="g g-target">타겟</span></td>
+            <td>${jobTag(t.직무)}</td>
+            <td style="font-weight:800;color:#e94560">${t.주간건수}건</td>
+            <td>${t.전주건수}건</td>
+            <td>${diff>0?`<span class="dp">▲${diff}</span>`:`<span class="dn">▼${Math.abs(diff)}</span>`}</td>
+            <td style="color:#718096">${t.전월주간평균}건</td>
+            <td class="L" style="font-size:.7rem;color:#64748b">${t.주요브랜드.slice(0,3).join(', ')}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ──────────────────────────────────────────
+// RISING POSITIONS
+// ──────────────────────────────────────────
+function renderRisingGrid() {
+  const R = D.risingPositions.filter(r => !isGenericRecruit(r.포지션명));
+  const colors = ['#f59e0b','#f97316','#8b5cf6','#0d9488','#3b82f6','#e94560'];
+  document.getElementById('risingGrid').innerHTML = R.map((r,i) => `
+    <div class="pos-card" style="--bc:${colors[i%colors.length]}">
+      <div class="pos-card-header">
+        <div>
+          <div class="pos-name">${r.포지션명}</div>
+          <div class="pos-cat">${r.직무} · 이번달 ${r.이번달건수}건</div>
+        </div>
+        <span class="g g-rising">라이징</span>
+      </div>
+      <div style="font-size:.73rem;color:#4a5568;line-height:1.55;margin-bottom:8px">${r.설명}</div>
+      <div class="pos-meta">
+        <div class="pos-meta-row"><div class="pos-meta-key">첫 등장</div><div class="pos-meta-val">${fmtDate(r.첫등장)}</div></div>
+        <div class="pos-meta-row"><div class="pos-meta-key">이번달 건수</div><div class="pos-meta-val" style="color:#f59e0b">${r.이번달건수}건</div></div>
+      </div>
+      <div class="pos-companies">주요 등장: ${r.주요브랜드.join(' · ')}</div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────
+// MONTHLY JOB STATS
+// ──────────────────────────────────────────
+function renderMonthlyJobStats() {
+  const S = D.monthlyJobStats;
+  const max = Math.max(...S.map(s=>s.건수));
+
+  // Chart
+  rebuildChart('jobFreqChart','bar',S.map(s=>s.직무),S.map(s=>s.건수),
+    ['#3b82f6','#22c55e','#f59e0b','#e94560','#8b5cf6','#0d9488','#f97316','#ec4899','#64748b','#14b8a6']);
+
+  // Trend bars
+  document.getElementById('jobTrendBars').innerHTML = S.map(s => {
+    const diff = s.건수 - s.전월;
+    const pct = Math.round(diff/Math.max(s.전월,1)*100);
+    const c = diff >= 0 ? '#22c55e' : '#e94560';
+    return `<div class="trend-bar-wrap">
+      <div class="trend-label">${s.직무}</div>
+      <div class="trend-bar-bg"><div class="trend-bar-fill" style="width:${Math.round(s.건수/max*100)}%;--c:${c}"></div></div>
+      <div class="trend-count" style="--c:${c}">${s.건수}</div>
+      <div class="trend-change ${diff>=0?'dg':'dp'}">${diff>=0?'▲':'▼'}${Math.abs(pct)}%</div>
+    </div>`;
+  }).join('');
+
+  // TOP 3
+  const top3 = [...S].sort((a,b)=>b.건수-a.건수).slice(0,3);
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('top3Jobs').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      ${top3.map((s,i)=>`
+        <div style="text-align:center;padding:16px;background:#f7f8fc;border-radius:10px">
+          <div style="font-size:1.8rem">${medals[i]}</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#1a202c;margin:4px 0">${s.직무}</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#3b82f6">${s.건수}건</div>
+          <div style="font-size:.72rem;color:#718096;margin-top:2px">전월 ${s.전월}건 → <span class="${s.건수>=s.전월?'dg':'dp'}">${s.건수>=s.전월?'+':''}${s.건수-s.전월}건</span></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ──────────────────────────────────────────
+// TARGET TOP 5
+// ──────────────────────────────────────────
+function renderTargetTop5() {
+  const T = D.targetPositions;
+  document.getElementById('targetTop5').innerHTML = `
+    <div class="card" style="padding:0">
+      <div class="scroll-x">
+        <table class="tbl">
+          <thead><tr><th>순위</th><th>포지션명</th><th>직무</th><th>이번주 건수</th><th>전월 주간평균</th><th>증감률</th><th>주요 브랜드</th></tr></thead>
+          <tbody>${T.map((t,i)=>{
+            const rate = Math.round((t.주간건수-t.전월주간평균)/Math.max(t.전월주간평균,1)*100);
+            return `<tr>
+              <td style="font-weight:800;font-size:.9rem">${i+1}</td>
+              <td class="L" style="font-weight:700">${t.포지션명}</td>
+              <td>${jobTag(t.직무)}</td>
+              <td style="font-weight:800;color:#e94560">${t.주간건수}건</td>
+              <td style="color:#718096">${t.전월주간평균}건</td>
+              <td><span class="dp">▲${rate}%</span></td>
+              <td class="L" style="font-size:.7rem;color:#64748b">${t.주요브랜드.join(', ')}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ──────────────────────────────────────────
+// RISING MONTHLY TABLE
+// ──────────────────────────────────────────
+function renderRisingMonthlyTable() {
+  document.getElementById('risingMonthlyTbody').innerHTML = D.risingPositions.filter(r => !isGenericRecruit(r.포지션명)).map(r => `
+    <tr>
+      <td class="L" style="font-weight:700">${r.포지션명}</td>
+      <td>${jobTag(r.직무)}</td>
+      <td>${fmtDate(r.첫등장)}</td>
+      <td style="font-weight:800;color:#f59e0b">${r.이번달건수}건</td>
+      <td class="L" style="font-size:.7rem;color:#64748b">${r.주요브랜드.join(', ')}</td>
+      <td><span class="g g-rising">라이징</span></td>
+    </tr>
+  `).join('');
+}
+
+// ──────────────────────────────────────────
+// BRAND SECTION
+// ──────────────────────────────────────────
+function renderBrandSection() {
+  const B = D.brandStats;
+  const top10 = B.slice(0,10);
+
+  rebuildChart('brandChart','bar',
+    top10.map(b=>b.브랜드), top10.map(b=>b.이번달),
+    ['#0f3460','#1d4ed8','#3b82f6','#60a5fa','#93c5fd','#bae6fd','#0ea5e9','#38bdf8','#7dd3fc','#e0f2fe']);
+
+  document.getElementById('brandTbody').innerHTML = B.map(b => {
+    const diff = b.이번달 - b.전월;
+    return `<tr>
+      <td style="font-weight:700">${b.순위}</td>
+      <td class="L" style="font-weight:700">${b.브랜드}</td>
+      <td style="font-weight:800">${b.이번달}</td>
+      <td style="color:#718096">${b.전월}</td>
+      <td>${diff>0?`<span class="dg">▲${diff}</span>`:diff<0?`<span class="dp">▼${Math.abs(diff)}</span>`:'—'}</td>
+      <td class="L" style="font-size:.7rem;color:#64748b">${b.주요직무}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────
+// SKILL TRENDS
+// ──────────────────────────────────────────
+function renderSkillTrends() {
+  const { up, down } = D.skillTrends;
+  document.getElementById('skillUpList').innerHTML = up.map(s => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <span class="skill-tag hot">${s.키워드}</span>
+      <div class="trend-bar-bg" style="flex:1"><div class="trend-bar-fill" style="width:${Math.round(s.건수/200*100)}%;--c:#e94560"></div></div>
+      <span style="font-size:.72rem;font-weight:800;color:#e94560;min-width:30px">${s.건수}</span>
+      <span class="dg" style="font-size:.7rem;min-width:40px">+${s.증가율}%</span>
+    </div>
+  `).join('');
+  document.getElementById('skillDownList').innerHTML = down.map(s => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <span class="skill-tag">${s.키워드}</span>
+      <div class="trend-bar-bg" style="flex:1"><div class="trend-bar-fill" style="width:${Math.round(s.건수/200*100)}%;--c:#94a3b8"></div></div>
+      <span style="font-size:.72rem;font-weight:800;color:#94a3b8;min-width:30px">${s.건수}</span>
+      <span class="dp" style="font-size:.7rem;min-width:40px">${s.감소율}%</span>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────
+// AI INSIGHTS
+// ──────────────────────────────────────────
+function generateAI() {
+  const T = D.targetPositions;
+  const R = D.risingPositions;
+  const S = D.monthlyJobStats;
+
+  // Target AI
+  const targetInsights = T.map(t => {
+    const rate = Math.round((t.주간건수-t.전월주간평균)/Math.max(t.전월주간평균,1)*100);
+    return {type:'r', title:`🎯 [${t.포지션명}] 1주 ${t.주간건수}건 — 전월 평균 대비 ${rate}% 급증`,
+      desc:`<strong>${t.주요브랜드.slice(0,3).join(', ')}</strong> 등 주요 K-뷰티 브랜드에서 동시 채용 중입니다. 인재풀 경쟁이 심화되기 전 선제적으로 후보자 리스트를 확보하고, 포컴퍼니 내 유사 역할 보유 현황을 점검하세요.`};
+  });
+  document.getElementById('ai-target').innerHTML = renderInsights(targetInsights);
+  document.getElementById('ai-m-target').innerHTML = renderInsights(targetInsights);
+
+  // Rising AI
+  const risingInsights = R.slice(0,3).map(r => ({
+    type:'y', title:`✨ [${r.포지션명}] — ${r.직무} 영역 신규 직무 등장`,
+    desc:`${r.설명} <strong>${r.주요브랜드.join(', ')}</strong>에서 채용 중입니다. 포컴퍼니 내 해당 역할의 필요성을 검토하고, 인재풀 선제 확보를 고려하세요.`
+  }));
+  document.getElementById('ai-rising').innerHTML = renderInsights(risingInsights);
+
+  // Monthly summary
+  if (!S || S.length === 0) {
+    document.getElementById('ai-monthly-summary').innerHTML = renderInsights([]);
+    return;
+  }
+  const topJob = [...S].sort((a,b)=>b.건수-a.건수)[0];
+  const fastGrow = [...S].sort((a,b)=>(b.건수-b.전월)-(a.건수-a.전월))[0];
+  const summary = [
+    {type:'b', title:`📊 이달 K-뷰티 채용 1위 직무: ${topJob.직무} (${topJob.건수}건)`,
+      desc:`전체 채용 공고 중 <strong>${topJob.직무}</strong>이 가장 많은 비중을 차지합니다. 글로벌 마케팅 채널 다각화 및 D2C 강화 전략이 채용 수요로 직결되는 추세입니다.`},
+    {type:'g', title:`📈 가장 빠르게 성장한 직무: ${fastGrow.직무} (+${fastGrow.건수-fastGrow.전월}건)`,
+      desc:`<strong>${fastGrow.직무}</strong> 직무가 전월 대비 ${fastGrow.건수-fastGrow.전월}건 증가하며 가장 가파른 성장세를 보입니다. 해당 직무 인재풀 확보 경쟁이 심화될 것으로 예상됩니다.`},
+    {type:'y', title:`⚠️ 라이징 포지션 ${R.length}개 포착 — 시장 선점 기회`,
+      desc:`이번 달 K-뷰티 업계에서 ${R.length > 0 ? '<strong>'+R.map(r=>r.포지션명).join(', ')+'</strong> 등 ' : ''}${R.length}개의 신규 포지션이 처음 등장했습니다. 업계 트렌드를 선도하는 브랜드들이 새로운 역할을 정의하는 시점으로, 포컴퍼니의 조직 방향과 연계하여 도입 여부를 검토할 것을 권고합니다.`},
+  ];
+  document.getElementById('ai-monthly-summary').innerHTML = renderInsights(summary);
+}
+
+function renderInsights(arr) {
+  if (!arr.length) return '<div style="color:#94a3b8;font-size:.78rem;text-align:center;padding:12px">데이터 없음</div>';
+  return arr.map(i => `
+    <div class="ins ins-${i.type}">
+      <div><div class="ins-title">${i.title}</div><div class="ins-desc">${i.desc}</div></div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────
+// TAB SWITCH
+// ──────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ──────────────────────────────────────────
+// NOTES
+// ──────────────────────────────────────────
+function saveNote(id) {
+  const text = document.getElementById(id)?.value || '';
+  const now = new Date().toLocaleString('ko-KR');
+  localStorage.setItem('jd_note_'+id, JSON.stringify({text, time:now}));
+  const meta = document.getElementById(id+'-meta');
+  if (meta) meta.textContent = '저장됨: '+now;
+}
+
+function loadAllNotes() {
+  ['hr-w1','hr-w2','hr-m1','hr-m2','hr-m3'].forEach(id => {
+    const saved = localStorage.getItem('jd_note_'+id);
+    if (saved) {
+      const {text, time} = JSON.parse(saved);
+      const el = document.getElementById(id);
+      if (el) el.value = text;
+      const meta = document.getElementById(id+'-meta');
+      if (meta) meta.textContent = '저장됨: '+time;
+    }
+  });
+}
+
+// ──────────────────────────────────────────
+// CHART HELPERS
+// ──────────────────────────────────────────
+function rebuildChart(id, type, labels, data, colors) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type,
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: type==='bar'?colors:'white', borderWidth: type==='bar'?0:2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: type==='bar'?'top':'right', labels: { font: { size:10, family:'Apple SD Gothic Neo' }, boxWidth:10 } } },
+      scales: type==='bar' ? { y:{ beginAtZero:true, ticks:{font:{size:10},precision:0}, grid:{color:'#f0f2f5'} }, x:{ticks:{font:{size:9},maxRotation:30}} } : {}
+    }
+  });
+}
+
+// ──────────────────────────────────────────
+// UTIL
+// ──────────────────────────────────────────
+function set(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+function val(id) { return (document.getElementById(id)||{}).value||''; }
+function fillSelect(id, opts) {
+  const el=document.getElementById(id); if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">전체</option>'+opts.map(o=>`<option ${o===cur?'selected':''}>${o}</option>`).join('');
+}
+
+const JOB_COLORS = {
+  '마케팅':'#3b82f6','영업':'#22c55e','디자인':'#f59e0b','상품기획':'#8b5cf6',
+  '제품개발':'#0d9488','SCM':'#f97316','기획':'#e94560','경영관리':'#64748b',
+  '제작':'#ec4899','직군':'#94a3b8'
+};
+function jobTag(job) {
+  const c = JOB_COLORS[job]||'#94a3b8';
+  return `<span style="background:${c}22;color:${c};padding:2px 7px;border-radius:10px;font-size:.68rem;font-weight:700">${job||'-'}</span>`;
+}
+function platformTag(plt) {
+  const cls = plt==='사람인'?'plt-saramin':plt==='원티드'?'plt-wanted':plt==='잡코리아'?'plt-jobkorea':plt==='구글'?'plt-google':'plt-homepage';
+  return `<span class="${cls}">${plt||'-'}</span>`;
+}
+
+// ──────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────
+window.onload = loadData;
+</script>
+</body>
+</html>
