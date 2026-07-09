@@ -24,7 +24,7 @@ RISING_LOOKBACK_DAYS = 30
 
 # ── 수집 대상 기업 목록 (두 엑셀 파일 기반 확정 화이트리스트) ──
 _lists_path = os.path.join(os.path.dirname(__file__), "company_lists.json")
-with open(_lists_path, encoding="utf-8") as f:
+with open(_lists_path, encoding="utf-8-sig") as f:
     _data = json.load(f)
 
 # 상위 90개 기업명 (헤더 행 제외)
