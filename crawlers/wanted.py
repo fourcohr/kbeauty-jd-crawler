@@ -19,7 +19,7 @@ def _normalize_co(name: str) -> str:
 def _company_matches(found: str, searched: str) -> bool:
     f = _normalize_co(found)
     s = _normalize_co(searched)
-    return bool(f and s and (s in f or f in s))
+    return bool(f and s and f == s)
 
 
 def crawl_company(company: str) -> list[dict]:
