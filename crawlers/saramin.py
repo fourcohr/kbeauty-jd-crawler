@@ -84,8 +84,8 @@ def _parse_jobs(soup, company_name: str, today: str) -> list[dict]:
     return jobs
 
 
-def crawl_company(company: str) -> list[dict]:
-    """단일 기업명으로 사람인 검색"""
+def crawl_company(company: str, days: int = 7) -> list[dict]:
+    """단일 기업명으로 사람인 검색 — 최근 days일 이내 등록 공고만 수집"""
     today = datetime.today().strftime("%Y-%m-%d")
     jobs = []
     for page in range(1, 3):
@@ -94,6 +94,8 @@ def crawl_company(company: str) -> list[dict]:
             "searchType": "company_nm",
             "recruitPage": page,
             "recruitPageCount": 40,
+            "recruitSort": "reg_dt",   # 최신 등록순 정렬
+            "period": days,            # 최근 N일 이내 등록된 공고만
         }
         try:
             resp = requests.get(BASE_URL, params=params, headers=HEADERS, timeout=10)
@@ -112,11 +114,11 @@ def crawl_company(company: str) -> list[dict]:
     return jobs
 
 
-def crawl(companies: list[str]) -> list[dict]:
+def crawl(companies: list[str], days: int = 7) -> list[dict]:
     """기업 리스트 전체 사람인 크롤링"""
     all_jobs = []
     for company in companies:
-        jobs = crawl_company(company)
+        jobs = crawl_company(company, days=days)
         if jobs:
             print(f"  [사람인] {company}: {len(jobs)}건")
             all_jobs.extend(jobs)

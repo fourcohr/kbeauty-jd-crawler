@@ -22,8 +22,10 @@ def _company_matches(found: str, searched: str) -> bool:
     return bool(f and s and f == s)
 
 
-def crawl_company(company: str) -> list[dict]:
+def crawl_company(company: str, days: int = 7) -> list[dict]:
     today = datetime.today().strftime("%Y-%m-%d")
+    from datetime import timedelta
+    cutoff = (datetime.today() - timedelta(days=days)).strftime("%Y-%m-%d")
     jobs = []
     offset = 0
     while True:
@@ -54,6 +56,9 @@ def crawl_company(company: str) -> list[dict]:
                 title = item.get("position", "")
                 career = item.get("experience_level", {}).get("name", "")
                 reg_date = (item.get("created_time") or "")[:10] or today
+                # 최근 N일 이내 등록된 공고만 수집
+                if reg_date < cutoff:
+                    continue
                 deadline = (item.get("due_time") or "")[:10]
                 jobs.append({
                     "수집일": today,
@@ -79,11 +84,11 @@ def crawl_company(company: str) -> list[dict]:
     return jobs
 
 
-def crawl(companies: list[str]) -> list[dict]:
+def crawl(companies: list[str], days: int = 7) -> list[dict]:
     """기업 리스트 전체 원티드 크롤링"""
     all_jobs = []
     for company in companies:
-        jobs = crawl_company(company)
+        jobs = crawl_company(company, days=days)
         if jobs:
             print(f"  [원티드] {company}: {len(jobs)}건")
             all_jobs.extend(jobs)

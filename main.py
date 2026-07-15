@@ -7,6 +7,7 @@ K뷰티 채용 트렌드 크롤러 메인 실행 파일
   python main.py --mode monthly  # 월간 분석만
   python main.py --dry-run       # 수집 테스트 (Sheets 저장 안함)
 """
+import os
 import sys
 import time
 from datetime import datetime, timedelta
@@ -31,13 +32,17 @@ def collect_daily(dry_run: bool = False):
     print(f"대상 기업: {len(PORTAL_TARGET_COMPANIES)}개 (포털) + {len(HOMEPAGE_TARGETS)}개 (홈페이지)")
     print("=" * 50)
 
+    # 최근 N일 이내 등록 공고만 수집 (기본 7일, 환경변수로 조정 가능)
+    crawl_days = int(os.environ.get("CRAWL_DAYS", "7"))
+    print(f"수집 기간: 최근 {crawl_days}일 이내 등록 공고")
+
     # 1. 사람인 - 기업명 직접 검색
-    jobs = saramin.crawl(PORTAL_TARGET_COMPANIES)
+    jobs = saramin.crawl(PORTAL_TARGET_COMPANIES, days=crawl_days)
     all_jobs.extend(jobs)
     time.sleep(2)
 
     # 2. 원티드 - 기업명 직접 검색
-    jobs = wanted.crawl(PORTAL_TARGET_COMPANIES)
+    jobs = wanted.crawl(PORTAL_TARGET_COMPANIES, days=crawl_days)
     all_jobs.extend(jobs)
     time.sleep(1)
 

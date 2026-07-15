@@ -93,79 +93,100 @@ def _classify_with_claude(jobs: list[dict]):
 
 # 타겟/라이징 포지션 분석
 def analyze_positions(records: list[dict]) -> dict:
-    """RAW_DATA 기반 타겟/라이징 포지션 분석"""
+    """RAW_DATA 기반 타겟/라이징 포지션 분석
+
+    타겟 포지션: 이번 주에 N개 이상의 회사가 동시에 채용 중인 포지션
+    라이징 포지션: 이번 달에 처음 등장한 포지션 (이전 달 데이터에 없던 것)
+    """
     from datetime import datetime, timedelta
     from collections import defaultdict
-    from config import TARGET_THRESHOLD, RISING_LOOKBACK_DAYS
+    from config import TARGET_THRESHOLD
 
     today = datetime.today()
     one_week_ago = today - timedelta(days=7)
-    one_month_ago = today - timedelta(days=RISING_LOOKBACK_DAYS)
+    this_month = today.strftime("%Y-%m")
 
-    # 포지션명 정규화 (소문자 + 공백 제거)
+    # 공채/일반 채용 및 플랫폼 UI 노이즈 키워드
+    generic_kw = ["신입", "인턴", "공채", "공개채용", "수시채용", "수시모집",
+                  "상반기", "하반기", "채용전형", "대졸",
+                  "greeting", "hot100", "지역별", "직업별", "역세권별",
+                  "헤드헌팅", "파견대행", "공고 요청", "커리어피드",
+                  "현직자 인터뷰", "스크랩", "최근본", "커뮤니티"]
+
     def normalize(name: str) -> str:
         return re.sub(r"\s+", " ", name.strip().lower())
 
-    weekly_counts = defaultdict(lambda: {"건수": 0, "직무": "", "브랜드": set()})
-    monthly_first_seen = {}  # 포지션명 -> 첫 등장일
+    def normalize_company(name: str) -> str:
+        """회사명 정규화 — (주), ㈜ 등 제거하여 같은 회사를 하나로 집계"""
+        name = re.sub(r'주식회사|㈜|\(주\)|\(유\)|유한회사|\s|\(|\)', '', name)
+        return name.lower()
+
+    # ── 타겟 포지션 ──────────────────────────────────────────
+    # 이번 주 등록 공고에서 포지션명별 채용 회사 수 집계
+    weekly = defaultdict(lambda: {"직무": "", "회사들": set()})
 
     for rec in records:
         pos = normalize(rec.get("포지션명", ""))
-        if not pos:
+        if not pos or any(kw in pos for kw in generic_kw):
             continue
-
-        # 등록일 파싱
         try:
             reg_date = datetime.strptime(rec.get("공고등록일", ""), "%Y-%m-%d")
         except Exception:
-            reg_date = today
+            continue
+        if reg_date < one_week_ago:
+            continue
+        weekly[pos]["직무"] = rec.get("직무", "기타")
+        weekly[pos]["회사들"].add(normalize_company(rec.get("회사명", "")))
 
-        company = rec.get("회사명", "")
-        job_cat = rec.get("직무", "기타")
-
-        # 주간 집계
-        if reg_date >= one_week_ago:
-            weekly_counts[pos]["건수"] += 1
-            weekly_counts[pos]["직무"] = job_cat
-            weekly_counts[pos]["브랜드"].add(company)
-
-        # 첫 등장일 추적 (전체 기간)
-        if pos not in monthly_first_seen or reg_date < monthly_first_seen[pos]:
-            monthly_first_seen[pos] = reg_date
-
-    # 타겟 포지션: 주간 10건 이상
     target = []
-    for pos, info in weekly_counts.items():
-        if info["건수"] >= TARGET_THRESHOLD:
+    for pos, info in weekly.items():
+        company_count = len(info["회사들"])
+        if company_count >= TARGET_THRESHOLD:
             target.append({
                 "포지션명": pos,
                 "직무": info["직무"],
-                "주간건수": info["건수"],
-                "주요브랜드": ", ".join(list(info["브랜드"])[:5]),
+                "주간건수": company_count,       # 채용 회사 수
+                "주요브랜드": ", ".join(list(info["회사들"])[:5]),
             })
     target.sort(key=lambda x: x["주간건수"], reverse=True)
 
-    # 공개채용/수시채용/신입인턴 등 일반 채용공고 제외 키워드
-    generic_kw = ["신입", "인턴", "공채", "공개채용", "수시채용", "수시모집",
-                  "상반기", "하반기", "채용전형", "대졸"]
+    # ── 라이징 포지션 ─────────────────────────────────────────
+    # 이전 달까지 한 번도 등장한 적 없는 포지션이 이번 달 새로 등장한 것
+    known = set()      # 이전 달 이전 데이터에 있던 포지션명 집합
+    this_month_data = defaultdict(lambda: {"직무": "", "회사들": set(), "첫등장일": None})
 
-    # 라이징 포지션: 최근 1개월 내 처음 등장한 포지션 (일반 채용공고 제외)
-    rising = []
-    for pos, first_date in monthly_first_seen.items():
-        if any(kw in pos for kw in generic_kw):
+    for rec in records:
+        pos = normalize(rec.get("포지션명", ""))
+        if not pos or any(kw in pos for kw in generic_kw):
             continue
-        if first_date >= one_month_ago:
-            info = weekly_counts.get(pos, {})
-            rising.append({
-                "포지션명": pos,
-                "직무": info.get("직무", "기타"),
-                "첫등장일": first_date.strftime("%Y-%m-%d"),
-                "이번달건수": sum(
-                    1 for r in records
-                    if normalize(r.get("포지션명", "")) == pos
-                ),
-                "주요브랜드": ", ".join(list(info.get("브랜드", set()))[:5]),
-            })
+        try:
+            reg_date = datetime.strptime(rec.get("공고등록일", ""), "%Y-%m-%d")
+        except Exception:
+            continue
+
+        month_str = reg_date.strftime("%Y-%m")
+        if month_str < this_month:
+            known.add(pos)
+        elif month_str == this_month:
+            d = this_month_data[pos]
+            d["직무"] = rec.get("직무", "기타")
+            d["회사들"].add(normalize_company(rec.get("회사명", "")))
+            if d["첫등장일"] is None or reg_date < d["첫등장일"]:
+                d["첫등장일"] = reg_date
+
+    rising = []
+    for pos, info in this_month_data.items():
+        if pos in known:
+            continue  # 이전 달에도 있었던 포지션
+        if len(info["회사들"]) < 2:
+            continue  # 1개 회사만 올린 건 노이즈로 제외
+        rising.append({
+            "포지션명": pos,
+            "직무": info["직무"],
+            "첫등장일": info["첫등장일"].strftime("%Y-%m-%d") if info["첫등장일"] else "",
+            "이번달건수": len(info["회사들"]),   # 채용 회사 수
+            "주요브랜드": ", ".join(list(info["회사들"])[:5]),
+        })
     rising.sort(key=lambda x: x["이번달건수"], reverse=True)
 
     return {"target": target, "rising": rising}

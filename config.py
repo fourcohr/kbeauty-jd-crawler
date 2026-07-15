@@ -19,7 +19,7 @@ JOB_CATEGORIES = [
     "상품기획", "영업", "제작", "SCM", "기타"
 ]
 
-TARGET_THRESHOLD = 10
+TARGET_THRESHOLD = 3  # 동일 포지션을 채용 중인 최소 회사 수
 RISING_LOOKBACK_DAYS = 30
 
 # ── 수집 대상 기업 목록 (두 엑셀 파일 기반 확정 화이트리스트) ──
