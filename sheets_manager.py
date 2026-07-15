@@ -1,4 +1,5 @@
 """Google Sheets 읽기/쓰기 관리"""
+import re
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
@@ -11,8 +12,13 @@ def get_sheet():
     return gc.open_by_key(SPREADSHEET_ID)
 
 
+def _normalize_co(name: str) -> str:
+    name = re.sub(r'주식회사|㈜|\(주\)|\(유\)|유한회사|\s|\(|\)', '', name)
+    return name.lower()
+
+
 def append_rows(sheet_name: str, rows: list[list]):
-    """RAW_DATA 등 시트에 행 추가. 중복(URL+회사명) 체크 포함."""
+    """RAW_DATA 등 시트에 행 추가. URL 중복 + 회사+포지션 중복 체크 포함."""
     if not rows:
         return 0
     sh = get_sheet()
@@ -20,9 +26,43 @@ def append_rows(sheet_name: str, rows: list[list]):
 
     if sheet_name == "RAW_DATA":
         existing = ws.get_all_values()
-        # URL(8번째 컬럼, index 7) 기준 중복 체크
-        existing_urls = {row[7] for row in existing[1:] if len(row) > 7 and row[7]}
-        new_rows = [r for r in rows if len(r) > 7 and r[7] not in existing_urls]
+        headers = existing[0] if existing else []
+        data_rows = existing[1:] if len(existing) > 1 else []
+
+        # 컬럼 인덱스 (헤더 기반, 없으면 고정 인덱스 fallback)
+        try:
+            url_idx     = headers.index("URL")
+            company_idx = headers.index("회사명")
+            pos_idx     = headers.index("포지션명")
+        except ValueError:
+            url_idx, company_idx, pos_idx = 7, 1, 2
+
+        existing_urls = {
+            row[url_idx] for row in data_rows
+            if len(row) > url_idx and row[url_idx]
+        }
+        existing_cp = {
+            (_normalize_co(row[company_idx]), row[pos_idx].strip().lower())
+            for row in data_rows
+            if len(row) > pos_idx
+        }
+
+        new_rows = []
+        for r in rows:
+            url     = r[url_idx]     if len(r) > url_idx     else ""
+            company = r[company_idx] if len(r) > company_idx else ""
+            pos     = r[pos_idx]     if len(r) > pos_idx     else ""
+            # URL 중복 또는 회사+포지션 중복이면 건너뜀
+            if url and url in existing_urls:
+                continue
+            cp_key = (_normalize_co(company), pos.strip().lower())
+            if cp_key in existing_cp:
+                continue
+            new_rows.append(r)
+            if url:
+                existing_urls.add(url)
+            existing_cp.add(cp_key)
+
         if not new_rows:
             return 0
         ws.append_rows(new_rows, value_input_option="USER_ENTERED")
