@@ -23,6 +23,23 @@ import crawlers.homepage as homepage
 import crawlers.detail as detail
 
 
+_GARBAGE_KW = [
+    '취업', '커피', '축하금', '구직', '이벤트', '지역별', '직업별',
+    'hot100', 'greeting', '헤드헌팅', '파견대행', '공고 요청', '스크랩',
+    '최근본', '커뮤니티', '현직자 인터뷰', '역세권별', '취업톡톡',
+    '합격축하금', '바로가기', '로그인', '회사소개', '복리후생',
+    '교육제도', '직무소개', '인사원칙', '공채정보',
+]
+
+def _is_valid_job(job: dict) -> bool:
+    """쓰레기 공고 필터: 포지션명이 너무 짧거나 노이즈 키워드 포함 시 제외"""
+    pos = job.get("포지션명", "").strip()
+    if len(pos) < 4:
+        return False
+    pos_lower = pos.lower()
+    return not any(kw.lower() in pos_lower for kw in _GARBAGE_KW)
+
+
 def collect_daily(dry_run: bool = False):
     """신규 공고 수집 및 RAW_DATA 저장 — 화이트리스트 기업만"""
     all_jobs = []
@@ -49,6 +66,12 @@ def collect_daily(dry_run: bool = False):
     # 3. 타사 홈페이지 직접 크롤링
     jobs = homepage.crawl(HOMEPAGE_TARGETS)
     all_jobs.extend(jobs)
+
+    # 노이즈 공고 제거 (포지션명이 너무 짧거나 쓰레기 키워드 포함)
+    before = len(all_jobs)
+    all_jobs = [j for j in all_jobs if _is_valid_job(j)]
+    if before - len(all_jobs):
+        print(f"[필터] 노이즈 공고 {before - len(all_jobs)}건 제거됨")
 
     print(f"\n[수집 완료] 총 {len(all_jobs)}건 (화이트리스트 기업만)")
 

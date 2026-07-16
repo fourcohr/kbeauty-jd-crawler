@@ -632,6 +632,17 @@ function fmtDate(v) {
   return `${y}.${m}.${day}`;
 }
 
+// 노이즈 공고 필터 (포지션명 길이 또는 쓰레기 키워드)
+const NOISE_KW = ['취업','커피','축하금','구직','이벤트','지역별','직업별',
+  'hot100','greeting','헤드헌팅','파견대행','공고 요청','스크랩',
+  '최근본','커뮤니티','현직자 인터뷰','역세권별','취업톡톡','합격축하금',
+  '바로가기','로그인','회사소개','복리후생','교육제도','직무소개','인사원칙','공채정보'];
+function isNoiseJob(name) {
+  if (!name || name.trim().length < 4) return true;
+  const lower = name.toLowerCase();
+  return NOISE_KW.some(kw => lower.includes(kw.toLowerCase()));
+}
+
 // 신입/인턴/공채 등 일반 채용공고 여부 판별
 const GENERIC_RECRUIT_KW = ['신입','인턴','공채','공개채용','수시채용','수시모집','상반기','하반기','채용전형','대졸'];
 function isGenericRecruit(name) {
@@ -764,6 +775,7 @@ function renderWeeklyTable() {
   const q     = val('wf-search').toLowerCase();
 
   const filtered = J.filter(r => {
+    if (isNoiseJob(r.포지션명)) return false;
     if (from || to) {
       const d = new Date(r.등록일);
       if (from && d < from) return false;
@@ -1103,6 +1115,7 @@ function computeTargetPositions(jobs, days = 30) {
     if (!job.등록일) continue;
     const d = new Date(job.등록일);
     if (isNaN(d.getTime()) || d < cutoff) continue;
+    if (isNoiseJob(job.포지션명 || '')) continue;
     const cat = mapToFCJob(job.포지션명 || '');
     if (!cat) continue;
     if (!catMap[cat]) catMap[cat] = { companies: new Set(), jobs: [] };
@@ -1134,7 +1147,9 @@ function computeRisingPositions(jobs, days = 30) {
   const unknownJobs = jobs.filter(job => {
     if (!job.등록일) return false;
     const d = new Date(job.등록일);
-    return !isNaN(d.getTime()) && d >= cutoff && mapToFCJob(job.포지션명 || '') === null;
+    return !isNaN(d.getTime()) && d >= cutoff
+      && !isNoiseJob(job.포지션명 || '')
+      && mapToFCJob(job.포지션명 || '') === null;
   });
 
   const kwGroups = {};
